@@ -35,22 +35,44 @@ function Editor({ setStatus }: any) {
   }, [text]);
 
   //  Save to backend
-  const handleSave = async () => {
+const handleSave = async () => {
   try {
-    const res = await fetch("https://vi-notes-4.onrender.com/api/sessions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userId: "testUser",
-        text,
-        keystrokes,
-        pasted,
-        startTime: new Date(),
-        endTime: new Date(),
-      }),
-    });
+    const userId = localStorage.getItem("userId");
+
+    // Safety check
+    if (!userId) {
+      alert("Please login first");
+      return;
+    }
+
+    // Authenticity logic
+    const isAuthentic = !pasted && keystrokes.length > 10;
+
+    // Show status
+    if (isAuthentic) {
+      setStatus("Authentic Content");
+    } else {
+      setStatus("Possibly Copied");
+    }
+
+    const res = await fetch(
+      "https://vi-notes-4.onrender.com/api/sessions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          text,
+          keystrokes,
+          pasted,
+          isAuthentic,
+          startTime: new Date(),
+          endTime: new Date(),
+        }),
+      }
+    );
 
     const data = await res.json();
     console.log("Saved:", data);
