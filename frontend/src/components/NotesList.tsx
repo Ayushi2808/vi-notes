@@ -10,7 +10,7 @@ function NotesList() {
   const [notes, setNotes] = useState<Session[]>([]);
   const [search, setSearch] = useState("");
 
-  const userId = localStorage.getItem("userId");
+  
 
 useEffect(() => {
   const fetchNotes = async () => {
