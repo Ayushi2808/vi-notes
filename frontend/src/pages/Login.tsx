@@ -6,7 +6,7 @@ function Login({ setUserId, setShowLogin }: any) {
 
   const handleLogin = async () => {
     try {
-      const res = await fetch("https://vi-notes-4.onrender.com/auth/login", {
+      const res = await fetch("https://vi-notes-4.onrender.com/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -7,7 +7,7 @@ function Register({ setShowLogin }: any) {
 
   const handleRegister = async () => {
     try {
-      const res = await fetch("https://vi-notes-4.onrender.com/auth/register", {
+      const res = await fetch("https://vi-notes-4.onrender.com/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
