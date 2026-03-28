@@ -24,7 +24,7 @@ useEffect(() => {
     }
   };
 
-  fetchNotes(); // ✅ always call
+  fetchNotes(); //  always call
 }, []);
 
   //  Filter notes
