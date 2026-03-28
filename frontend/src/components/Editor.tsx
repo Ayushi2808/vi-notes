@@ -36,36 +36,35 @@ function Editor({ setStatus }: any) {
 
   //  Save to backend
   const handleSave = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/api/sessions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: "testUser",
-          text,
-          keystrokes,
-          pasted,
-          startTime: new Date(),
-          endTime: new Date(),
-        }),
-      });
+  try {
+    const res = await fetch("https://vi-notes-4.onrender.com/api/sessions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: "testUser",
+        text,
+        keystrokes,
+        pasted,
+        startTime: new Date(),
+        endTime: new Date(),
+      }),
+    });
 
-      const data = await res.json();
-      console.log("Saved:", data);
+    const data = await res.json();
+    console.log("Saved:", data);
 
-      alert("Saved successfully!");
+    alert("Saved successfully!");
 
-      // reset after save
-      setText("");
-      setKeystrokes([]);
-      setPasted(false);
-    } catch (err) {
-      console.error("Save error:", err);
-      alert("Error saving note");
-    }
-  };
+    setText("");
+    setKeystrokes([]);
+    setPasted(false);
+  } catch (err) {
+    console.error("Save error:", err);
+    alert("Error saving note");
+  }
+};
 
   return (
     <div

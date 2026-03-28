@@ -6,7 +6,7 @@ function Login({ setUserId, setShowLogin }: any) {
 
   const handleLogin = async () => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/sessions`, {
+      const res = await fetch("https://vi-notes-4.onrender.com/api/sessions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

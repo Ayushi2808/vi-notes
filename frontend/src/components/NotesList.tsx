@@ -15,8 +15,7 @@ function NotesList() {
 useEffect(() => {
   const fetchNotes = async () => {
     try {
-      const res = await fetch(
-        "http://localhost:5000/api/sessions"
+      const res = await fetch("https://vi-notes-4.onrender.com/api/sessions"
       );
       const data = await res.json();
       setNotes(data);
