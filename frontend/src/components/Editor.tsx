@@ -13,7 +13,7 @@ function Editor({
   const [localPasted, setLocalPasted] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
 
-  // ✅ Track typing
+  //  Track typing
   const handleKeyDown = (e: any) => {
     const now = Date.now();
 
@@ -35,7 +35,7 @@ function Editor({
     });
   };
 
-  // ✅ Detect paste properly
+  // Detect paste properly
   const handlePaste = (e: any) => {
     setLocalPasted(true);
     setPasted(true); // send to parent
@@ -44,12 +44,12 @@ function Editor({
     setText((prev) => prev + pastedText);
   };
 
-  // ✅ Send text length to parent
+  //Send text length to parent
   useEffect(() => {
-    setTextLength(text.length);
-  }, [text]);
+  setTextLength(text.length);
+}, [text, setTextLength]);
 
-  // ✅ Save
+  // Save
   const handleSave = async () => {
     try {
       const userId = localStorage.getItem("userId");
@@ -96,7 +96,7 @@ function Editor({
 
       alert("Saved successfully!");
 
-      // ✅ Reset everything
+      //Reset everything
       setText("");
       setLocalKeystrokes([]);
       setLocalPasted(false);
