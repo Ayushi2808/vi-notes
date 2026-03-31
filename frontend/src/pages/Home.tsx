@@ -13,6 +13,7 @@ function Home() {
   const [textLength, setTextLength] = useState(0);
   const [pasted, setPasted] = useState(false);
   const [keystrokes, setKeystrokes] = useState<Keystroke[]>([]);
+  const [isAuthentic, setIsAuthentic] = useState(false);
 
   return (
     <div
@@ -51,18 +52,20 @@ function Home() {
   }}
 >
   <Editor
-    setStatus={setStatus}
-    setTextLength={setTextLength}
-    setPasted={setPasted}
-    setKeystrokes={setKeystrokes}
-  />
+  setStatus={setStatus}
+  setTextLength={setTextLength}
+  setPasted={setPasted}
+  setKeystrokes={setKeystrokes}
+  setIsAuthentic={setIsAuthentic}
+/>
 
   <Analytics
-    status={status}
-    textLength={textLength}
-    pasted={pasted}
-    keystrokes={keystrokes}
-  />
+  status={status}
+  textLength={textLength}
+  pasted={pasted}
+  keystrokes={keystrokes}
+  isAuthentic={isAuthentic}
+/>
 
   <NotesList />
 </div>
