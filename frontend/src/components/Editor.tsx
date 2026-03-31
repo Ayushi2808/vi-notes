@@ -1,15 +1,24 @@
 import { useState, useEffect } from "react";
 
-function Editor({ setStatus }: any) {
+function Editor({
+  setStatus,
+  setTextLength,
+  setPasted,
+  setKeystrokes,
+  setIsAuthentic,
+}: any) {
   const [text, setText] = useState("");
   const [lastTime, setLastTime] = useState(Date.now());
-  const [charCount, setCharCount] = useState(0);
-  const [keystrokes, setKeystrokes] = useState<any[]>([]);
-  const [pasted, setPasted] = useState(false);
+  const [localKeystrokes, setLocalKeystrokes] = useState<any[]>([]);
+  const [localPasted, setLocalPasted] = useState(false);
+  const [startTime, setStartTime] = useState<number | null>(null);
 
-  // Track typing / thinking
+  // ✅ Track typing
   const handleKeyDown = (e: any) => {
     const now = Date.now();
+
+    if (!startTime) setStartTime(now);
+
     const delay = now - lastTime;
 
     if (delay > 2000) setStatus("Thinking...");
@@ -17,76 +26,93 @@ function Editor({ setStatus }: any) {
 
     setLastTime(now);
 
-    // store keystrokes
-    setKeystrokes((prev) => [
-      ...prev,
-      { key: e.key, timestamp: now },
-    ]);
+    const newStroke = { key: e.key, timestamp: now };
+
+    setLocalKeystrokes((prev: any[]) => {
+      const updated = [...prev, newStroke];
+      setKeystrokes(updated); // ✅ send to parent
+      return updated;
+    });
   };
 
-  //  Detect paste
-  const handlePaste = () => {
-    setPasted(true);
+  // ✅ Detect paste properly
+  const handlePaste = (e: any) => {
+    setLocalPasted(true);
+    setPasted(true); // send to parent
+
+    const pastedText = e.clipboardData.getData("text");
+    setText((prev) => prev + pastedText);
   };
 
-  //  Character count
+  // ✅ Send text length to parent
   useEffect(() => {
-    setCharCount(text.length);
+    setTextLength(text.length);
   }, [text]);
 
-  //  Save to backend
-const handleSave = async () => {
-  try {
-    const userId = localStorage.getItem("userId");
+  // ✅ Save
+  const handleSave = async () => {
+    try {
+      const userId = localStorage.getItem("userId");
 
-    // Safety check
-    if (!userId) {
-      alert("Please login first");
-      return;
-    }
-
-    // Authenticity logic
-    const isAuthentic = !pasted && keystrokes.length > 10;
-
-    // Show status
-    if (isAuthentic) {
-      setStatus("Authentic Content");
-    } else {
-      setStatus("Possibly Copied");
-    }
-
-    const res = await fetch(
-      "https://vi-notes-4.onrender.com/api/sessions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId,
-          text,
-          keystrokes,
-          pasted,
-          isAuthentic,
-          startTime: new Date(),
-          endTime: new Date(),
-        }),
+      if (!userId) {
+        alert("Please login first");
+        return;
       }
-    );
 
-    const data = await res.json();
-    console.log("Saved:", data);
+      if (text.trim().length === 0) {
+        alert("Cannot save empty note");
+        return;
+      }
 
-    alert("Saved successfully!");
+      const isAuthentic =
+        text.length > 20 &&
+        localKeystrokes.length > 20 &&
+        !localPasted;
 
-    setText("");
-    setKeystrokes([]);
-    setPasted(false);
-  } catch (err) {
-    console.error("Save error:", err);
-    alert("Error saving note");
-  }
-};
+      setIsAuthentic(isAuthentic);
+
+      setStatus(
+        isAuthentic ? "Authentic Content" : "Possibly Copied"
+      );
+
+      await fetch(
+        "https://vi-notes-4.onrender.com/api/sessions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId,
+            text,
+            keystrokes: localKeystrokes,
+            pasted: localPasted,
+            isAuthentic,
+            startTime,
+            endTime: Date.now(),
+          }),
+        }
+      );
+
+      alert("Saved successfully!");
+
+      // ✅ Reset everything
+      setText("");
+      setLocalKeystrokes([]);
+      setLocalPasted(false);
+      setStartTime(null);
+
+      setKeystrokes([]);
+      setPasted(false);
+      setTextLength(0);
+      setIsAuthentic(false);
+      setStatus("Idle");
+
+    } catch (err) {
+      console.error("Save error:", err);
+      alert("Error saving note");
+    }
+  };
 
   return (
     <div
@@ -100,7 +126,7 @@ const handleSave = async () => {
         flexDirection: "column",
       }}
     >
-      <h2> Vi-Notes Editor</h2>
+      <h2>Vi-Notes Editor</h2>
 
       <textarea
         value={text}
@@ -125,12 +151,11 @@ const handleSave = async () => {
         style={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
           marginTop: "15px",
         }}
       >
         <span style={{ color: "#666" }}>
-          Characters: {charCount}
+          Characters: {text.length}
         </span>
 
         <button
